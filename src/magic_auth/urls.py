@@ -1,6 +1,5 @@
 from django.urls import path
-from magic_auth import views
-
+from src.magic_auth import views
 
 app_name = 'magic_auth'
 

@@ -2,12 +2,12 @@ from django.shortcuts import HttpResponse, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import F
 
-from magic_auth.forms import MagicUserSignUpForm
+from src.magic_auth.forms import MagicUserSignUpForm
 
 
 class MagicUserSignUp(CreateView):
