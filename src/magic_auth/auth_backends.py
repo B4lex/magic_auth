@@ -1,20 +1,10 @@
-from django.contrib.auth.backends import BaseBackend, UserModel
+from django.contrib.auth.backends import UserModel, ModelBackend
 
 
-class AuthByTokenBackend(BaseBackend):
-    def authenticate(self, request, *, token=None, email=None, password=None, **kwargs):
-        # authentication with email and password added for login to admin panel
-        user = None
+class AuthByTokenBackend(ModelBackend):
+    def authenticate(self, request, token=None, **kwargs):
         if token:
             try:
-                user = UserModel.objects.get(auth_token=token)
+                return UserModel.objects.get(auth_token=token)
             except UserModel.DoesNotExist:
                 pass
-        elif email and password:
-            try:
-                user = UserModel.objects.get(email=email)
-                if not user.check_password(password):
-                    user = None
-            except UserModel.DoesNotExist:
-                pass
-        return user

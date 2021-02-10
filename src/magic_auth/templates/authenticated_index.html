@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Auth page</title>
+    <title>Hello</title>
 </head>
 <body>
     <h1>Welcome, authenticated user.</h1>
-    <h2>You have have signed in {{ login_count }} time.</h2>
+    <h2>You have signed in {{ login_count }} time.</h2>
     <h2>Your email: {{ user.email }}</h2>
+    <h3><a href ={% url 'magic_auth:logout' %}>LogOut</a></h3>
 </body>
 </html>
