@@ -1,31 +1,22 @@
-import base64
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.hashers import make_password
-from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
 
 class MagicUser(AbstractUser):
-    password = None
-    username = None
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
+    password = models.CharField(max_length=64, default='securepassword123')
     email = models.EmailField(unique=True, error_messages={'unique': 'User with specified email exists.'})
     auth_token = models.CharField(max_length=64, unique=True)
-    login_count = models.PositiveSmallIntegerField(default=0)
+    logins = models.ManyToManyField('magic_auth.LoginActivity')
     has_access = models.BooleanField(default=True)
 
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
+    class Meta:
+        verbose_name = _('Magic user')
+        verbose_name_plural = _('Magic users')
 
 
-@receiver(models.signals.post_save, sender=MagicUser)
-def set_auth_token(**kwargs):
-    instance = kwargs['instance']
-    if not instance.auth_token:
-        instance.auth_token = base64.urlsafe_b64encode(
-            (make_password(instance.email) + hex(instance.id)).encode('utf-8')
-        ).decode('utf-8')
-        instance.save()
+class LoginActivity(models.Model):
+    at = models.DateTimeField(auto_now_add=True)

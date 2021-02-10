@@ -1,13 +1,14 @@
-from django.shortcuts import HttpResponse, render
+from django.shortcuts import HttpResponse, redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import F
 
-from src.magic_auth.forms import MagicUserSignUpForm
+from magic_auth.forms import MagicUserSignUpForm
 
 
 class MagicUserSignUp(CreateView):
@@ -40,10 +41,26 @@ class SignUpSuccessView(TemplateView):
 
 def magic_user_sign_in(request, token):
     user = authenticate(request, token=token)
-    if user:
+    if user and user.has_access:
         user.login_count = F('login_count') + 1
         user.save()
         user.refresh_from_db()
-        return render(request, 'page_for_authenticated.html', {'user': user})
+        print("login")
+        login(request, user)
+        return redirect(reverse_lazy('magic_auth:page_for_auth_index'))
     else:
         return HttpResponse('<h1>Invalid auth token.</h1>')
+
+
+class PageForAuthenticatedUsers(LoginRequiredMixin, TemplateView):
+    template_name = 'authenticated_index.html'
+    login_url = reverse_lazy('magic_auth:sign_up')
+
+    def dispatch(self, request, *args, **kwargs):
+        print(request.user)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['login_count'] = self.request.user.logins.count()
+        return context_data

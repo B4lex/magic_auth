@@ -120,9 +120,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTHENTICATION_BACKENDS = [
-    'magic_auth.auth_backends.AuthByTokenBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'magic_auth.auth_backends.AuthByTokenBackend',
+# ]
 AUTH_USER_MODEL = 'magic_auth.MagicUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
